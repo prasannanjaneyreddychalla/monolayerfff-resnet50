@@ -2,71 +2,77 @@
 
 ResNet50 transfer learning for monolayer FFF image classification.
 
-This repo is a practical implementation around the dataset and paper linked in `details.txt`. The goal is simple: use image data from the monolayer FFF work, train a ResNet50-based classifier, and compare training and validation performance across epochs.
+This repo builds on the IEEE paper linked in `details.txt` and implements the same general idea in a compact ResNet50 pipeline: take monolayer FFF image data, preprocess it, train a CNN-based classifier, and track how well it separates the classes during validation.
+
+> Note: the IEEE page is the source reference for the paper and dataset. The repo keeps those links in `details.txt`; the implementation here is our ResNet50 version of that image-classification workflow.
 
 ---
 
-## Source material
+## Reference paper and dataset
 
-| Source | What it adds |
+| Item | Detail |
 |---|---|
-| `details.txt` | Paper and dataset reference links |
-| IEEE paper | Background for the dataset and task |
-| This repo | ResNet50-based setup and training result |
+| Paper source | IEEE Xplore link in `details.txt` |
+| Dataset context | Monolayer FFF image dataset described by the linked paper |
+| Task type | Image classification |
+| Input type | Monolayer FFF images |
+| Goal | Classify images using visual patterns learned by a CNN |
 
-Paper links from `details.txt`:
+Links from `details.txt`:
 
 - https://ieeexplore.ieee.org/abstract/document/11143237
 - https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=11143237
 
 ---
 
-## Setup
+## What the paper setup gives us
+
+The linked paper/dataset gives the project its base problem: classify monolayer FFF images using image-based learning. In plain terms, the data is visual, the signal comes from image features, and the model needs to learn patterns that separate the target classes.
+
+That makes a CNN a natural fit. ResNet50 is useful here because it already has strong image feature extraction layers, so we do not have to train a deep network from scratch like we enjoy wasting GPUs for sport.
+
+---
+
+## Our implementation
 
 ```mermaid
 flowchart LR
     A[Monolayer FFF images] --> B[Preprocessing]
     B --> C[ResNet50 backbone]
-    C --> D[Classification head]
+    C --> D[Custom classification head]
     D --> E[Training]
     E --> F[Validation accuracy]
 ```
 
-The implementation uses ResNet50 as the main feature extractor and adds a classifier head for the monolayer FFF task. It follows the paper/dataset direction, but keeps the training setup focused and lightweight.
+Our setup uses ResNet50 as the backbone and adds a task-specific classifier head on top. The model is trained over 8 epochs, with training and validation accuracy tracked after each epoch.
 
 ---
 
-## Paper vs this implementation
+## Paper vs our implementation
 
-| Part | Paper / dataset reference | This repo |
+| Area | Paper / dataset reference | Our implementation |
 |---|---|---|
-| Task | Monolayer FFF image classification | Same task focus |
-| Input | Image dataset referenced in the paper | Images are passed through preprocessing |
-| Model idea | Deep learning for visual classification | ResNet50 transfer learning |
-| Output | Class prediction and model performance | Accuracy tracked across 8 epochs |
-| Best result here | - | **0.9404 validation accuracy** |
+| Problem | Monolayer FFF image classification | Same classification problem |
+| Data | Dataset described in the IEEE paper | Uses the referenced monolayer FFF image data |
+| Model style | Deep-learning image classification | ResNet50 transfer learning |
+| Feature learning | CNN learns visual patterns from image data | ResNet50 extracts features, classifier head predicts class |
+| Evaluation focus | Classification performance | Training vs validation accuracy over 8 epochs |
+| Reported result here | Paper is referenced through `details.txt` | Best validation accuracy: **0.9404** |
 
 ---
 
-## Training result
+## Result
 
-Your run reached a best validation accuracy of **0.9404**. Training accuracy improved steadily, and validation accuracy stayed strong across most epochs. Nice little curve, honestly. The model did not embarrass itself, which is more than can be said for most group projects.
+The model reached a best validation accuracy of **0.9404**. Validation accuracy climbed quickly after the first epoch and stayed close to training accuracy, which suggests the model learned useful image features without obvious severe overfitting in this run.
 
-```mermaid
-xychart-beta
-    title "Training vs Validation Accuracy"
-    x-axis "Epoch" [1, 2, 3, 4, 5, 6, 7, 8]
-    y-axis "Accuracy" 0.60 --> 0.96
-    line "Train Accuracy" [0.657, 0.825, 0.869, 0.886, 0.901, 0.912, 0.934, 0.912]
-    line "Validation Accuracy" [0.682, 0.907, 0.894, 0.927, 0.9404, 0.908, 0.941, 0.927]
-```
+![Training vs Validation Accuracy](assets/graph.jpeg)
 
 | Metric | Value |
 |---|---:|
 | Best validation accuracy | **0.9404** |
-| Epoch marked as best in the result graph | 5 |
-| Final training accuracy | 0.912 |
-| Final validation accuracy | 0.927 |
+| Best epoch marked in graph | 5 |
+| Final training accuracy | ~0.912 |
+| Final validation accuracy | ~0.927 |
 | Total epochs | 8 |
 
 ---
@@ -75,26 +81,13 @@ xychart-beta
 
 | Observation | Meaning |
 |---|---|
-| Validation accuracy jumps after epoch 1 | ResNet50 features transfer well to this image task |
-| Training accuracy rises steadily | The model keeps adapting across epochs |
-| Validation stays close to training | No obvious severe overfitting in this run |
-| Best score appears around the middle | The strongest checkpoint is around epoch 5 |
-
----
-
-## Model flow
-
-```mermaid
-graph TD
-    A[Input image] --> B[Resize / normalize]
-    B --> C[ResNet50]
-    C --> D[Feature vector]
-    D --> E[Classifier head]
-    E --> F[Predicted class]
-```
+| Validation jumps from epoch 1 to 2 | The pretrained ResNet50 features adapt fast |
+| Training accuracy rises steadily | The classifier keeps improving through training |
+| Validation stays near training | No obvious major overfitting from this graph alone |
+| Best validation score appears around epoch 5 | The strongest saved checkpoint should likely come from that region |
 
 ---
 
 ## Quick takeaway
 
-This repo adapts ResNet50 to the monolayer FFF classification problem referenced in `details.txt`. The current training run reaches **94.04% validation accuracy**, which gives a strong baseline for comparing future model changes.
+This repo applies ResNet50 transfer learning to the monolayer FFF image-classification task referenced by the IEEE paper in `details.txt`. The current run gives a strong baseline, reaching **94.04% validation accuracy** across 8 epochs.
