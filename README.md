@@ -1,71 +1,115 @@
 # monolayerfff-resnet50
 
-ResNet50 transfer learning for monolayer FFF image classification.
+ResNet50 transfer learning for the **MonolayerFFF** image-classification dataset.
 
-This repo builds on the IEEE paper linked in `details.txt` and implements the same general idea in a compact ResNet50 pipeline: take monolayer FFF image data, preprocess it, train a CNN-based classifier, and track how well it separates the classes during validation.
-
-> Note: the IEEE page is the source reference for the paper and dataset. The repo keeps those links in `details.txt`; the implementation here is our ResNet50 version of that image-classification workflow.
+This repo takes the MonolayerFFF dataset from the IEEE Access paper and trains a ResNet50-based classifier for the same three printing-condition classes: **D1**, **D2**, and **H**.
 
 ---
 
-## Reference paper and dataset
+## Dataset
 
-| Item | Detail |
+The MonolayerFFF paper introduces a public image dataset for Fused Filament Fabrication (FFF) 3D printing process monitoring. The dataset focuses only on monolayer parts, which makes it different from older FFF datasets built around full multi-layer parts.
+
+| Detail | Value |
+|---|---:|
+| Total images | 776 |
+| Defect 1 images | 274 |
+| Defect 2 images | 231 |
+| Regular images | 271 |
+| Image type | Surface images of monolayer FFF parts |
+| Part size | 25 x 25 x 0.4 mm |
+| Classes | D1, D2, H |
+| Augmentation in paper dataset | None |
+
+The parts were printed using blue PLA filament, scanned at 600 dpi, segmented with OpenCV, and saved as individual PNG images.
+
+---
+
+## Classes
+
+| Class | Meaning | What changed during fabrication |
+|---|---|---|
+| H | Regular part | No induced defect |
+| D1 | Defect 1 | Reduced filament deposition in specific contour regions |
+| D2 | Defect 2 | Filament retraction on the middle raster line |
+
+Both D1 and D2 are designed to mimic under-extrusion, just in different regions of the printed part. Tiny defect, big classification headache. Naturally.
+
+---
+
+## Paper setup
+
+The paper evaluates the dataset using **GoogLeNet** in MATLAB.
+
+| Item | Paper setup |
 |---|---|
-| Paper source | IEEE Xplore link in `details.txt` |
-| Dataset context | Monolayer FFF image dataset described by the linked paper |
-| Task type | Image classification |
-| Input type | Monolayer FFF images |
-| Goal | Classify images using visual patterns learned by a CNN |
+| Model | GoogLeNet |
+| Framework | MATLAB |
+| Split | 70% train, 30% validation |
+| Optimizer | SGDM |
+| Batch size | 32 |
+| Epochs | 25 |
+| Learning rate | 0.001 |
+| Dropout | 50% |
+| Best validation accuracy | 95.81% |
 
-Links from `details.txt`:
-
-- https://ieeexplore.ieee.org/abstract/document/11143237
-- https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=11143237
-
----
-
-## What the paper setup gives us
-
-The linked paper/dataset gives the project its base problem: classify monolayer FFF images using image-based learning. In plain terms, the data is visual, the signal comes from image features, and the model needs to learn patterns that separate the target classes.
-
-That makes a CNN a natural fit. ResNet50 is useful here because it already has strong image feature extraction layers, so we do not have to train a deep network from scratch like we enjoy wasting GPUs for sport.
+The paper also used a separate test set with 40 images per class. That test set was produced using the same printing and scanning method, but it was not part of the main MonolayerFFF dataset.
 
 ---
 
-## Our implementation
+## Our setup
+
+This repo reimplements the classification pipeline using **PyTorch** and **ResNet50**.
 
 ```mermaid
 flowchart LR
-    A[Monolayer FFF images] --> B[Preprocessing]
-    B --> C[ResNet50 backbone]
-    C --> D[Custom classification head]
-    D --> E[Training]
+    A[MonolayerFFF images] --> B[CSV split]
+    B --> C[Image transforms]
+    C --> D[ResNet50 backbone]
+    D --> E[Dropout + Linear classifier]
     E --> F[Validation accuracy]
 ```
 
-Our setup uses ResNet50 as the backbone and adds a task-specific classifier head on top. The model is trained over 8 epochs, with training and validation accuracy tracked after each epoch.
+| Item | This repo |
+|---|---|
+| Model | ResNet50 |
+| Framework | PyTorch |
+| Input size | 224 x 224 |
+| Split | 80% train, 20% validation |
+| Batch size | 16 |
+| Max epochs | 20 |
+| Early stopping patience | 3 |
+| Optimizer | Adam |
+| Learning rate | 0.0001 |
+| Loss | Cross entropy |
+| Classes | 3 |
+| Best validation accuracy | 94.04% |
+
+The ResNet50 backbone starts with ImageNet weights. Most of the backbone is frozen, while the final ResNet block is unfrozen for fine-tuning. The original classifier is replaced with a dropout layer and a final linear layer for the three MonolayerFFF classes.
 
 ---
 
 ## Paper vs our implementation
 
-| Area | Paper / dataset reference | Our implementation |
+| Area | Paper | This repo |
 |---|---|---|
-| Problem | Monolayer FFF image classification | Same classification problem |
-| Data | Dataset described in the IEEE paper | Uses the referenced monolayer FFF image data |
-| Model style | Deep-learning image classification | ResNet50 transfer learning |
-| Feature learning | CNN learns visual patterns from image data | ResNet50 extracts features, classifier head predicts class |
-| Evaluation focus | Classification performance | Training vs validation accuracy over 8 epochs |
-| Reported result here | Paper is referenced through `details.txt` | Best validation accuracy: **0.9404** |
+| Backbone | GoogLeNet | ResNet50 |
+| Framework | MATLAB | PyTorch |
+| Train / validation split | 70 / 30 | 80 / 20 |
+| Optimizer | SGDM | Adam |
+| Batch size | 32 | 16 |
+| Max epochs | 25 | 20 with early stopping |
+| Learning rate | 0.001 | 0.0001 |
+| Data augmentation | No augmentation for dataset composition | Training transforms include flip, rotation, color jitter, and random resized crop |
+| Best validation accuracy | 95.81% | 94.04% |
+
+The paper’s GoogLeNet result is slightly higher, but our ResNet50 setup gets close with a smaller validation split, different optimizer, different training code, and a shorter run. Not bad for a repo that initially had a README full of placeholders. Character development, unfortunately.
 
 ---
 
 ## Result
 
-The model reached a best validation accuracy of **0.9404**. Validation accuracy climbed quickly after the first epoch and stayed close to training accuracy, which suggests the model learned useful image features without obvious severe overfitting in this run.
-
-![Training vs Validation Accuracy](assets/graph.jpeg)
+![Training vs Validation Accuracy](assets/graph.svg)
 
 | Metric | Value |
 |---|---:|
@@ -73,21 +117,29 @@ The model reached a best validation accuracy of **0.9404**. Validation accuracy 
 | Best epoch marked in graph | 5 |
 | Final training accuracy | ~0.912 |
 | Final validation accuracy | ~0.927 |
-| Total epochs | 8 |
+| Total epochs shown | 8 |
+
+Validation accuracy rises quickly and stays close to training accuracy, which suggests the model learned the key visual differences without obvious severe overfitting in this run.
 
 ---
 
-## What the curve shows
+## Files
 
-| Observation | Meaning |
+| File | Purpose |
 |---|---|
-| Validation jumps from epoch 1 to 2 | The pretrained ResNet50 features adapt fast |
-| Training accuracy rises steadily | The classifier keeps improving through training |
-| Validation stays near training | No obvious major overfitting from this graph alone |
-| Best validation score appears around epoch 5 | The strongest saved checkpoint should likely come from that region |
+| `create_csv_split.py` | Builds train and validation CSV files from the image folders |
+| `prepare.py` | Alternate CSV split script using a relative parent dataset path |
+| `csv_dataset.py` | CSV-based dataset helper |
+| `train_resnet50.py` | Main ResNet50 training script |
+| `test.py` | Quick PyTorch / CUDA check |
+| `details.txt` | Paper and dataset reference links |
+| `assets/graph.svg` | Clean result graph used in this README |
 
 ---
 
-## Quick takeaway
+## Source
 
-This repo applies ResNet50 transfer learning to the monolayer FFF image-classification task referenced by the IEEE paper in `details.txt`. The current run gives a strong baseline, reaching **94.04% validation accuracy** across 8 epochs.
+Paper: **MonolayerFFF: An Image Dataset of MonolayerFFF 3D Printed Parts With Different Fabrication Conditions**
+
+Dataset: **MonolayerFFF**, Mendeley Data V2  
+https://data.mendeley.com/datasets/k66f2gbgb4/2

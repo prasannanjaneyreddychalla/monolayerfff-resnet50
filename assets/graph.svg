@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+  <rect width="900" height="560" fill="white"/>
+  <text x="450" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="24">Training vs Validation Accuracy</text>
+  <line x1="90" y1="470" x2="830" y2="470" stroke="#222" stroke-width="2"/>
+  <line x1="90" y1="80" x2="90" y2="470" stroke="#222" stroke-width="2"/>
+  <g font-family="Arial, sans-serif" font-size="13" fill="#222">
+    <text x="450" y="530" text-anchor="middle">Epoch</text>
+    <text x="25" y="275" transform="rotate(-90 25 275)" text-anchor="middle">Accuracy</text>
+  </g>
+  <g stroke="#ddd" stroke-width="1">
+    <line x1="90" y1="470" x2="830" y2="470"/>
+    <line x1="90" y1="392" x2="830" y2="392"/>
+    <line x1="90" y1="314" x2="830" y2="314"/>
+    <line x1="90" y1="236" x2="830" y2="236"/>
+    <line x1="90" y1="158" x2="830" y2="158"/>
+    <line x1="90" y1="80" x2="830" y2="80"/>
+    <line x1="90" y1="80" x2="90" y2="470"/>
+    <line x1="196" y1="80" x2="196" y2="470"/>
+    <line x1="301" y1="80" x2="301" y2="470"/>
+    <line x1="407" y1="80" x2="407" y2="470"/>
+    <line x1="513" y1="80" x2="513" y2="470"/>
+    <line x1="619" y1="80" x2="619" y2="470"/>
+    <line x1="724" y1="80" x2="724" y2="470"/>
+    <line x1="830" y1="80" x2="830" y2="470"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#222">
+    <text x="78" y="474" text-anchor="end">0.65</text>
+    <text x="78" y="396" text-anchor="end">0.70</text>
+    <text x="78" y="318" text-anchor="end">0.75</text>
+    <text x="78" y="240" text-anchor="end">0.80</text>
+    <text x="78" y="162" text-anchor="end">0.85</text>
+    <text x="78" y="84" text-anchor="end">0.95</text>
+    <text x="90" y="492" text-anchor="middle">1</text>
+    <text x="196" y="492" text-anchor="middle">2</text>
+    <text x="301" y="492" text-anchor="middle">3</text>
+    <text x="407" y="492" text-anchor="middle">4</text>
+    <text x="513" y="492" text-anchor="middle">5</text>
+    <text x="619" y="492" text-anchor="middle">6</text>
+    <text x="724" y="492" text-anchor="middle">7</text>
+    <text x="830" y="492" text-anchor="middle">8</text>
+  </g>
+  <polyline points="90,459 196,316 301,246 407,214 513,190 619,173 724,140 830,174" fill="none" stroke="#1f77b4" stroke-width="4"/>
+  <polyline points="90,419 196,185 301,205 407,152 513,132 619,184 724,131 830,152" fill="none" stroke="#ff7f0e" stroke-width="4"/>
+  <g fill="#1f77b4">
+    <circle cx="90" cy="459" r="6"/><circle cx="196" cy="316" r="6"/><circle cx="301" cy="246" r="6"/><circle cx="407" cy="214" r="6"/>
+    <circle cx="513" cy="190" r="6"/><circle cx="619" cy="173" r="6"/><circle cx="724" cy="140" r="6"/><circle cx="830" cy="174" r="6"/>
+  </g>
+  <g fill="#ff7f0e">
+    <rect x="84" y="413" width="12" height="12"/><rect x="190" y="179" width="12" height="12"/><rect x="295" y="199" width="12" height="12"/><rect x="401" y="146" width="12" height="12"/>
+    <rect x="507" y="126" width="12" height="12"/><rect x="613" y="178" width="12" height="12"/><rect x="718" y="125" width="12" height="12"/><rect x="824" y="146" width="12" height="12"/>
+  </g>
+  <polygon points="513,108 500,142 526,142" fill="#1f77b4" stroke="#222" stroke-width="2"/>
+  <text x="535" y="142" font-family="Arial, sans-serif" font-size="16" fill="#222">Best: 0.9404</text>
+  <rect x="590" y="385" width="230" height="70" fill="white" stroke="#ccc"/>
+  <line x1="610" y1="407" x2="650" y2="407" stroke="#1f77b4" stroke-width="4"/>
+  <circle cx="630" cy="407" r="6" fill="#1f77b4"/>
+  <text x="665" y="412" font-family="Arial, sans-serif" font-size="14">Train Accuracy</text>
+  <line x1="610" y1="435" x2="650" y2="435" stroke="#ff7f0e" stroke-width="4"/>
+  <rect x="624" y="429" width="12" height="12" fill="#ff7f0e"/>
+  <text x="665" y="440" font-family="Arial, sans-serif" font-size="14">Validation Accuracy</text>
+</svg>
